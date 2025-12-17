@@ -17,25 +17,44 @@ class AppSettings:
     openai_api_key: str = ""
     cisco_client_id: str = ""
     cisco_client_secret: str = ""
-    default_llm_provider: str = "anthropic"  # "anthropic" or "openai"
+    default_llm_provider: str = "bedrock"  # "anthropic", "openai", or "bedrock"
     embedding_model: str = "all-MiniLM-L6-v2"
+    # AWS Bedrock settings
+    aws_region: str = "us-east-1"
+    bedrock_model_id: str = "anthropic.claude-sonnet-4-20250514-v1:0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
     def is_configured(self) -> bool:
-        """Check if at least one LLM API key is configured."""
+        """Check if at least one LLM is configured."""
+        # Bedrock uses IAM roles, so it's always "configured" when selected
+        if self.default_llm_provider == "bedrock":
+            return True
         return bool(self.anthropic_api_key or self.openai_api_key)
 
-    def get_active_llm_key(self) -> tuple:
-        """Get the active LLM provider and key."""
-        if self.default_llm_provider == "openai" and self.openai_api_key:
-            return ("openai", self.openai_api_key)
+    def get_active_llm_config(self) -> Dict[str, Any]:
+        """Get the active LLM provider configuration."""
+        if self.default_llm_provider == "bedrock":
+            return {
+                "provider": "bedrock",
+                "region": self.aws_region,
+                "model_id": self.bedrock_model_id
+            }
+        elif self.default_llm_provider == "openai" and self.openai_api_key:
+            return {"provider": "openai", "api_key": self.openai_api_key}
         elif self.anthropic_api_key:
-            return ("anthropic", self.anthropic_api_key)
+            return {"provider": "anthropic", "api_key": self.anthropic_api_key}
         elif self.openai_api_key:
-            return ("openai", self.openai_api_key)
-        return (None, None)
+            return {"provider": "openai", "api_key": self.openai_api_key}
+        return {"provider": None}
+
+    def get_active_llm_key(self) -> tuple:
+        """Get the active LLM provider and key (legacy support)."""
+        config = self.get_active_llm_config()
+        if config["provider"] == "bedrock":
+            return ("bedrock", None)
+        return (config.get("provider"), config.get("api_key"))
 
 
 class SettingsStore:
@@ -94,8 +113,10 @@ class SettingsStore:
                 openai_api_key=self._decrypt(data.get("openai_api_key", "")),
                 cisco_client_id=self._decrypt(data.get("cisco_client_id", "")),
                 cisco_client_secret=self._decrypt(data.get("cisco_client_secret", "")),
-                default_llm_provider=data.get("default_llm_provider", "anthropic"),
-                embedding_model=data.get("embedding_model", "all-MiniLM-L6-v2")
+                default_llm_provider=data.get("default_llm_provider", "bedrock"),
+                embedding_model=data.get("embedding_model", "all-MiniLM-L6-v2"),
+                aws_region=data.get("aws_region", "us-east-1"),
+                bedrock_model_id=data.get("bedrock_model_id", "anthropic.claude-sonnet-4-20250514-v1:0")
             )
         except Exception:
             self._settings = AppSettings()
@@ -112,7 +133,9 @@ class SettingsStore:
             "cisco_client_id": self._encrypt(settings.cisco_client_id),
             "cisco_client_secret": self._encrypt(settings.cisco_client_secret),
             "default_llm_provider": settings.default_llm_provider,
-            "embedding_model": settings.embedding_model
+            "embedding_model": settings.embedding_model,
+            "aws_region": settings.aws_region,
+            "bedrock_model_id": settings.bedrock_model_id
         }
 
         self.storage_path.write_text(json.dumps(data, indent=2))

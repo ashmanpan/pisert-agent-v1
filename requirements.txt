@@ -3,7 +3,11 @@ langgraph
 langchain
 langchain-anthropic
 langchain-openai
+langchain-aws
 langchain-community
+
+# AWS
+boto3
 
 # Vector Database
 qdrant-client

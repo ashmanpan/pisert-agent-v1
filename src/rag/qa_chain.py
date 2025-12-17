@@ -69,34 +69,59 @@ def create_llm(provider: str = None, api_key: str = None, temperature: float = 0
     Create an LLM instance based on provider and API key.
 
     Args:
-        provider: 'anthropic' or 'openai'. If None, uses settings.
-        api_key: API key. If None, uses settings.
+        provider: 'anthropic', 'openai', or 'bedrock'. If None, uses settings.
+        api_key: API key. If None, uses settings (not needed for bedrock).
         temperature: LLM temperature
 
     Returns:
         LLM instance
     """
     settings = get_settings()
+    config = settings.get_active_llm_config()
 
-    if provider is None or api_key is None:
-        provider, api_key = settings.get_active_llm_key()
+    if provider is None:
+        provider = config.get("provider")
 
-    if not provider or not api_key:
-        raise ValueError("No LLM API key configured. Please configure API keys in Admin settings.")
+    if not provider:
+        raise ValueError("No LLM provider configured. Please configure in Admin settings.")
 
-    if provider == "anthropic":
+    if provider == "bedrock":
+        from langchain_aws import ChatBedrock
+        import boto3
+
+        # Use IAM role credentials (automatic in ECS)
+        bedrock_client = boto3.client(
+            "bedrock-runtime",
+            region_name=config.get("region", settings.aws_region)
+        )
+
+        return ChatBedrock(
+            client=bedrock_client,
+            model_id=config.get("model_id", settings.bedrock_model_id),
+            model_kwargs={
+                "temperature": temperature,
+                "max_tokens": 4096
+            }
+        )
+    elif provider == "anthropic":
         from langchain_anthropic import ChatAnthropic
+        key = api_key or config.get("api_key")
+        if not key:
+            raise ValueError("Anthropic API key not configured.")
         return ChatAnthropic(
             model="claude-sonnet-4-20250514",
-            anthropic_api_key=api_key,
+            anthropic_api_key=key,
             temperature=temperature,
             max_tokens=4096
         )
     elif provider == "openai":
         from langchain_openai import ChatOpenAI
+        key = api_key or config.get("api_key")
+        if not key:
+            raise ValueError("OpenAI API key not configured.")
         return ChatOpenAI(
             model="gpt-4o",
-            openai_api_key=api_key,
+            openai_api_key=key,
             temperature=temperature,
             max_tokens=4096
         )
