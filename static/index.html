@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSIRT Security Analysis Agent</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <h1>PSIRT Security Agent</h1>
+                </div>
+                <div class="header-status">
+                    <span id="connection-status" class="status-badge status-checking">Checking...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-tab="dashboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        Dashboard
+                    </button>
+                    <button class="nav-item" data-tab="query">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        Query
+                    </button>
+                    <button class="nav-item" data-tab="advisories">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <path d="M14 2v6h6"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        Advisories
+                    </button>
+                    <button class="nav-item" data-tab="inventory">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                        Inventory
+                    </button>
+                    <button class="nav-item" data-tab="analyze">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                        Analyze
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Tab -->
+                <section id="dashboard-tab" class="tab-content active">
+                    <h2>Security Dashboard</h2>
+
+                    <div class="stats-grid">
+                        <div class="stat-card critical">
+                            <div class="stat-icon">!</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="critical-count">0</span>
+                                <span class="stat-label">Critical</span>
+                            </div>
+                        </div>
+                        <div class="stat-card high">
+                            <div class="stat-icon">!</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="high-count">0</span>
+                                <span class="stat-label">High</span>
+                            </div>
+                        </div>
+                        <div class="stat-card medium">
+                            <div class="stat-icon">!</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="medium-count">0</span>
+                                <span class="stat-label">Medium</span>
+                            </div>
+                        </div>
+                        <div class="stat-card low">
+                            <div class="stat-icon">i</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="low-count">0</span>
+                                <span class="stat-label">Low</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-sections">
+                        <div class="section recent-advisories">
+                            <h3>Recent Advisories</h3>
+                            <div id="recent-list" class="advisory-list">
+                                <p class="empty-message">No advisories loaded. Run analysis to fetch PSIRT data.</p>
+                            </div>
+                        </div>
+
+                        <div class="section quick-actions">
+                            <h3>Quick Actions</h3>
+                            <button class="action-btn" onclick="switchTab('analyze')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                </svg>
+                                Run Analysis
+                            </button>
+                            <button class="action-btn" onclick="switchTab('query')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                                Ask a Question
+                            </button>
+                            <button class="action-btn" onclick="switchTab('inventory')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                Upload Inventory
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Query Tab -->
+                <section id="query-tab" class="tab-content">
+                    <h2>Security Q&A</h2>
+
+                    <div class="query-container">
+                        <div class="query-input-section">
+                            <textarea id="query-input" placeholder="Ask a security question... e.g., 'What vulnerabilities affect IOS XR 7.x?' or 'How do I mitigate CVE-2024-xxxxx?'"></textarea>
+                            <div class="query-options">
+                                <select id="severity-filter">
+                                    <option value="">All Severities</option>
+                                    <option value="Critical">Critical</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                                <button id="query-btn" class="primary-btn" onclick="submitQuery()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13"/>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                    </svg>
+                                    Ask
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="query-results" class="query-results">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                                <p>Ask a question to search the security knowledge base</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Advisories Tab -->
+                <section id="advisories-tab" class="tab-content">
+                    <h2>Security Advisories</h2>
+
+                    <div class="advisories-toolbar">
+                        <input type="search" id="advisory-search" placeholder="Search advisories...">
+                        <select id="advisory-severity-filter" onchange="loadAdvisories()">
+                            <option value="">All Severities</option>
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+
+                    <div id="advisories-list" class="advisories-table">
+                        <div class="table-header">
+                            <span>Advisory ID</span>
+                            <span>Title</span>
+                            <span>Severity</span>
+                            <span>Risk Score</span>
+                            <span>Actions</span>
+                        </div>
+                        <div id="advisories-body" class="table-body">
+                            <p class="empty-message">No advisories loaded yet.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Inventory Tab -->
+                <section id="inventory-tab" class="tab-content">
+                    <h2>Device Inventory</h2>
+
+                    <div class="upload-section">
+                        <div class="upload-zone" id="upload-zone">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p>Drag & drop Excel file here or click to browse</p>
+                            <input type="file" id="file-input" accept=".xlsx,.xls" hidden>
+                        </div>
+                    </div>
+
+                    <div id="inventory-display" class="inventory-display">
+                        <div class="inventory-stats">
+                            <span id="device-count">0 devices</span>
+                            <span id="product-count">0 products</span>
+                        </div>
+                        <div id="inventory-table" class="inventory-table">
+                            <p class="empty-message">No inventory loaded. Upload an Excel file to get started.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analyze Tab -->
+                <section id="analyze-tab" class="tab-content">
+                    <h2>Run Analysis</h2>
+
+                    <div class="analyze-config">
+                        <div class="config-section">
+                            <h3>Analysis Settings</h3>
+                            <div class="config-options">
+                                <label>
+                                    <input type="checkbox" id="include-scraping" checked>
+                                    Include web scraping
+                                </label>
+                                <label>
+                                    Products to analyze:
+                                    <input type="text" id="products-input" placeholder="IOS XR, IOS XE, ASR9K">
+                                </label>
+                            </div>
+                            <button id="start-analysis-btn" class="primary-btn large" onclick="startAnalysis()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"/>
+                                </svg>
+                                Start Analysis
+                            </button>
+                        </div>
+
+                        <div class="analysis-progress" id="analysis-progress" style="display: none;">
+                            <h3>Analysis Progress</h3>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div id="progress-status" class="progress-status">Initializing...</div>
+                            <div id="progress-messages" class="progress-messages"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Advisory Detail Modal -->
+                <div id="advisory-modal" class="modal">
+                    <div class="modal-content">
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                        <div id="modal-body"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

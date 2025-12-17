@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSIRT Security Q&A</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --critical: #dc2626;
+            --high: #ea580c;
+            --medium: #ca8a04;
+            --low: #65a30d;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo svg {
+            width: 28px;
+            height: 28px;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.25rem;
+        }
+
+        .header-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .header-links a:hover {
+            color: var(--primary);
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome p {
+            color: var(--text-secondary);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            min-height: 400px;
+            max-height: 500px;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-user .message-content {
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius) var(--radius) 4px var(--radius);
+            max-width: 80%;
+        }
+
+        .message-assistant {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message-assistant .message-content {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius) var(--radius) var(--radius) 4px;
+            max-width: 90%;
+        }
+
+        .message-content {
+            padding: 1rem 1.25rem;
+            line-height: 1.6;
+        }
+
+        .message-content p {
+            margin-bottom: 0.75rem;
+        }
+
+        .message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-content ul, .message-content ol {
+            margin-left: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .message-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        .message-content strong {
+            color: var(--primary);
+        }
+
+        .message-content code {
+            background: var(--bg-primary);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .sources {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .sources-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .source-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-primary);
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .severity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .severity-critical { background: var(--critical); }
+        .severity-high { background: var(--high); }
+        .severity-medium { background: var(--medium); }
+        .severity-low { background: var(--low); }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+
+        .confidence-high { background: var(--success); color: white; }
+        .confidence-medium { background: var(--medium); color: black; }
+        .confidence-low { background: var(--danger); color: white; }
+
+        .input-area {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-top: 1px solid var(--border);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-wrapper textarea {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+            resize: none;
+            min-height: 50px;
+            max-height: 150px;
+            font-family: inherit;
+        }
+
+        .input-wrapper textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .input-wrapper textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .suggestion {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion:hover {
+            background: var(--border);
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .loading-message {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .not-configured {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--medium);
+            color: var(--medium);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .not-configured a {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <h1>PSIRT Security Q&A</h1>
+        </div>
+        <nav class="header-links">
+            <a href="/">Dashboard</a>
+            <a href="/admin">Admin</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="welcome">
+            <h2>Ask Security Questions</h2>
+            <p>Get AI-powered answers about Cisco security advisories and vulnerabilities</p>
+        </div>
+
+        <div id="not-configured-alert" class="not-configured" style="display: none;">
+            <strong>LLM Not Configured</strong><br>
+            Please <a href="/admin">configure API keys</a> in the Admin panel first.
+        </div>
+
+        <div class="suggestions" id="suggestions">
+            <button class="suggestion" onclick="askQuestion('What critical vulnerabilities affect IOS XR?')">
+                Critical IOS XR vulnerabilities
+            </button>
+            <button class="suggestion" onclick="askQuestion('How do I mitigate ASR9K security issues?')">
+                ASR9K mitigations
+            </button>
+            <button class="suggestion" onclick="askQuestion('What patches are available for NCS devices?')">
+                NCS patches
+            </button>
+            <button class="suggestion" onclick="askQuestion('Summarize high-risk security advisories')">
+                High-risk summary
+            </button>
+        </div>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="empty-state" id="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <p>Ask a question about security advisories to get started</p>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea
+                        id="question-input"
+                        placeholder="Ask about security vulnerabilities, advisories, or mitigations..."
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                    ></textarea>
+                    <button class="send-btn" id="send-btn" onclick="submitQuestion()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = '/api';
+        let isConfigured = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkConfiguration();
+            autoResizeTextarea();
+        });
+
+        async function checkConfiguration() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/status`);
+                const data = await response.json();
+
+                isConfigured = data.llm_configured;
+
+                if (!isConfigured) {
+                    document.getElementById('not-configured-alert').style.display = 'block';
+                    document.getElementById('send-btn').disabled = true;
+                }
+            } catch (error) {
+                console.error('Failed to check configuration:', error);
+            }
+        }
+
+        function autoResizeTextarea() {
+            const textarea = document.getElementById('question-input');
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+            });
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                submitQuestion();
+            }
+        }
+
+        function askQuestion(question) {
+            document.getElementById('question-input').value = question;
+            submitQuestion();
+        }
+
+        async function submitQuestion() {
+            const input = document.getElementById('question-input');
+            const question = input.value.trim();
+
+            if (!question) return;
+            if (!isConfigured) {
+                alert('Please configure API keys in the Admin panel first.');
+                return;
+            }
+
+            // Hide empty state and suggestions
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('suggestions').style.display = 'none';
+
+            // Add user message
+            addMessage(question, 'user');
+
+            // Clear input
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Add loading message
+            const loadingId = addLoadingMessage();
+
+            // Disable send button
+            document.getElementById('send-btn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/query`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question: question,
+                        limit: 5
+                    })
+                });
+
+                // Remove loading
+                removeMessage(loadingId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addAssistantMessage(data);
+                } else {
+                    const error = await response.json();
+                    addErrorMessage(error.detail || 'Failed to get response');
+                }
+            } catch (error) {
+                removeMessage(loadingId);
+                addErrorMessage(`Error: ${error.message}`);
+            } finally {
+                document.getElementById('send-btn').disabled = false;
+            }
+        }
+
+        function addMessage(content, type) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message message-${type}`;
+            div.innerHTML = `<div class="message-content"><p>${escapeHtml(content)}</p></div>`;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+            return div;
+        }
+
+        function addAssistantMessage(data) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'message message-assistant';
+
+            // Format the answer
+            let formattedAnswer = formatAnswer(data.answer);
+
+            // Build sources HTML
+            let sourcesHtml = '';
+            if (data.sources && data.sources.length > 0) {
+                sourcesHtml = `
+                    <div class="sources">
+                        <div class="sources-title">Sources</div>
+                        ${data.sources.map(s => `
+                            <span class="source-item">
+                                <span class="severity-dot severity-${s.severity.toLowerCase()}"></span>
+                                ${s.advisory_id}
+                            </span>
+                        `).join('')}
+                        <span class="confidence-badge confidence-${data.confidence}">${data.confidence}</span>
+                    </div>
+                `;
+            }
+
+            div.innerHTML = `
+                <div class="message-content">
+                    ${formattedAnswer}
+                    ${sourcesHtml}
+                </div>
+            `;
+
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addLoadingMessage() {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'message message-assistant';
+            div.id = 'loading-' + Date.now();
+            div.innerHTML = `
+                <div class="message-content">
+                    <div class="loading-message">
+                        <div class="loading-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span>Analyzing security advisories...</span>
+                    </div>
+                </div>
+            `;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+            return div.id;
+        }
+
+        function addErrorMessage(message) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'message message-assistant';
+            div.innerHTML = `<div class="message-content error-message">${escapeHtml(message)}</div>`;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function removeMessage(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function formatAnswer(text) {
+            // Convert markdown-like formatting to HTML
+            return text
+                .split('\n\n').map(para => `<p>${para}</p>`).join('')
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/- (.*?)(<br>|<\/p>)/g, '<li>$1</li>$2')
+                .replace(/(\d+)\. (.*?)(<br>|<\/p>)/g, '<li>$2</li>$3');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

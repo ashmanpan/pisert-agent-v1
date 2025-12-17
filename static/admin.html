@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSIRT Agent - Admin Settings</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .header h1 svg {
+            width: 32px;
+            height: 32px;
+            color: var(--primary);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h2 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h2 svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-dot.green { background: var(--success); }
+        .status-dot.red { background: var(--danger); }
+        .status-dot.yellow { background: var(--warning); }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-test {
+            padding: 0.75rem;
+            min-width: 80px;
+        }
+
+        .provider-select {
+            margin-bottom: 1rem;
+        }
+
+        .provider-select label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .provider-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .provider-option {
+            flex: 1;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .provider-option:hover {
+            border-color: var(--primary);
+        }
+
+        .provider-option.selected {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .provider-option input {
+            display: none;
+        }
+
+        .provider-option .provider-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .provider-option .provider-status {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .current-value {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                Admin Settings
+            </h1>
+            <p>Configure API keys and system settings</p>
+        </header>
+
+        <nav class="nav-links">
+            <a href="/">Full Dashboard</a>
+            <a href="/user">User Q&A</a>
+            <a href="/docs">API Docs</a>
+        </nav>
+
+        <div id="alert-container"></div>
+
+        <!-- System Status -->
+        <div class="card">
+            <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                System Status
+            </h2>
+            <div class="status-grid" id="status-grid">
+                <div class="status-item">
+                    <span class="status-dot yellow" id="llm-status"></span>
+                    <span>LLM: <span id="llm-status-text">Checking...</span></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot yellow" id="qdrant-status"></span>
+                    <span>Qdrant: <span id="qdrant-status-text">Checking...</span></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot yellow" id="anthropic-status"></span>
+                    <span>Anthropic: <span id="anthropic-status-text">Checking...</span></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot yellow" id="openai-status"></span>
+                    <span>OpenAI: <span id="openai-status-text">Checking...</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Default LLM Provider -->
+        <div class="card">
+            <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+                Default LLM Provider
+            </h2>
+            <div class="provider-options">
+                <label class="provider-option" id="provider-anthropic">
+                    <input type="radio" name="provider" value="anthropic">
+                    <div class="provider-name">Anthropic (Claude)</div>
+                    <div class="provider-status" id="anthropic-key-status">Not configured</div>
+                </label>
+                <label class="provider-option" id="provider-openai">
+                    <input type="radio" name="provider" value="openai">
+                    <div class="provider-name">OpenAI (GPT-4)</div>
+                    <div class="provider-status" id="openai-key-status">Not configured</div>
+                </label>
+            </div>
+        </div>
+
+        <!-- API Keys -->
+        <div class="card">
+            <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                </svg>
+                API Keys
+            </h2>
+
+            <div class="form-group">
+                <label>Anthropic API Key</label>
+                <div class="input-wrapper">
+                    <input type="password" id="anthropic-key" placeholder="sk-ant-api03-...">
+                    <button class="btn btn-secondary btn-test" onclick="testKey('anthropic')">Test</button>
+                </div>
+                <div class="current-value" id="anthropic-current">Current: Not set</div>
+            </div>
+
+            <div class="form-group">
+                <label>OpenAI API Key</label>
+                <div class="input-wrapper">
+                    <input type="password" id="openai-key" placeholder="sk-proj-...">
+                    <button class="btn btn-secondary btn-test" onclick="testKey('openai')">Test</button>
+                </div>
+                <div class="current-value" id="openai-current">Current: Not set</div>
+            </div>
+
+            <div class="form-group">
+                <label>Cisco Client ID (Optional)</label>
+                <input type="text" id="cisco-client-id" placeholder="Cisco API Client ID">
+                <div class="current-value" id="cisco-id-current">Current: Not set</div>
+            </div>
+
+            <div class="form-group">
+                <label>Cisco Client Secret (Optional)</label>
+                <input type="password" id="cisco-client-secret" placeholder="Cisco API Client Secret">
+                <div class="current-value" id="cisco-secret-current">Current: Not set</div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                        <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Save Settings
+                </button>
+                <button class="btn btn-danger" onclick="clearSettings()">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            loadStatus();
+
+            // Provider selection
+            document.querySelectorAll('.provider-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.provider-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    option.querySelector('input').checked = true;
+                });
+            });
+        });
+
+        async function loadStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/status`);
+                const data = await response.json();
+
+                updateStatus('llm', data.llm_configured, data.llm_configured ? 'Configured' : 'Not configured');
+                updateStatus('qdrant', data.qdrant_connected, data.qdrant_connected ? 'Connected' : 'Disconnected');
+                updateStatus('anthropic', data.anthropic_configured, data.anthropic_configured ? 'Configured' : 'Not configured');
+                updateStatus('openai', data.openai_configured, data.openai_configured ? 'Configured' : 'Not configured');
+
+            } catch (error) {
+                console.error('Failed to load status:', error);
+            }
+        }
+
+        function updateStatus(id, isOk, text) {
+            const dot = document.getElementById(`${id}-status`);
+            const textEl = document.getElementById(`${id}-status-text`);
+            dot.className = `status-dot ${isOk ? 'green' : 'red'}`;
+            textEl.textContent = text;
+        }
+
+        async function loadSettings() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/settings`);
+                const data = await response.json();
+
+                document.getElementById('anthropic-current').textContent = `Current: ${data.anthropic_api_key}`;
+                document.getElementById('openai-current').textContent = `Current: ${data.openai_api_key}`;
+                document.getElementById('cisco-id-current').textContent = `Current: ${data.cisco_client_id}`;
+                document.getElementById('cisco-secret-current').textContent = `Current: ${data.cisco_client_secret}`;
+
+                // Update key status in provider options
+                document.getElementById('anthropic-key-status').textContent =
+                    data.anthropic_api_key !== 'Not configured' ? 'Configured' : 'Not configured';
+                document.getElementById('openai-key-status').textContent =
+                    data.openai_api_key !== 'Not configured' ? 'Configured' : 'Not configured';
+
+                // Select default provider
+                const provider = data.default_llm_provider || 'anthropic';
+                document.getElementById(`provider-${provider}`).classList.add('selected');
+                document.querySelector(`input[value="${provider}"]`).checked = true;
+
+            } catch (error) {
+                showAlert('Failed to load settings', 'error');
+            }
+        }
+
+        async function saveSettings() {
+            const anthropicKey = document.getElementById('anthropic-key').value;
+            const openaiKey = document.getElementById('openai-key').value;
+            const ciscoId = document.getElementById('cisco-client-id').value;
+            const ciscoSecret = document.getElementById('cisco-client-secret').value;
+            const provider = document.querySelector('input[name="provider"]:checked')?.value || 'anthropic';
+
+            const payload = {
+                default_llm_provider: provider
+            };
+
+            if (anthropicKey) payload.anthropic_api_key = anthropicKey;
+            if (openaiKey) payload.openai_api_key = openaiKey;
+            if (ciscoId) payload.cisco_client_id = ciscoId;
+            if (ciscoSecret) payload.cisco_client_secret = ciscoSecret;
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showAlert('Settings saved successfully!', 'success');
+                    // Clear input fields
+                    document.getElementById('anthropic-key').value = '';
+                    document.getElementById('openai-key').value = '';
+                    document.getElementById('cisco-client-id').value = '';
+                    document.getElementById('cisco-client-secret').value = '';
+                    // Reload
+                    loadSettings();
+                    loadStatus();
+                } else {
+                    const error = await response.json();
+                    showAlert(`Failed to save: ${error.detail}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testKey(provider) {
+            const keyInput = document.getElementById(`${provider}-key`);
+            const key = keyInput.value;
+
+            if (!key) {
+                showAlert('Please enter an API key to test', 'warning');
+                return;
+            }
+
+            const btn = keyInput.nextElementSibling;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>';
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/test-key`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ provider, api_key: key })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert(`Test failed: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Test';
+            }
+        }
+
+        async function clearSettings() {
+            if (!confirm('Are you sure you want to clear all settings? This cannot be undone.')) {
+                return;
+            }
+
+            try {
+                await fetch(`${API_BASE}/admin/settings`, { method: 'DELETE' });
+                showAlert('Settings cleared', 'success');
+                loadSettings();
+                loadStatus();
+            } catch (error) {
+                showAlert(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
