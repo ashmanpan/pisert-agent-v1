@@ -1,38 +1,42 @@
 # LangGraph and LangChain
-langgraph>=0.2.0
-langchain>=0.3.0
-langchain-anthropic>=0.2.0
-langchain-openai>=0.2.0
-langchain-community>=0.3.0
+langgraph
+langchain
+langchain-anthropic
+langchain-openai
+langchain-community
 
 # Vector Database
-qdrant-client>=1.12.0
+qdrant-client
 
 # Web Framework
-fastapi>=0.115.0
-uvicorn[standard]>=0.32.0
-python-multipart>=0.0.12
+fastapi
+uvicorn[standard]
+python-multipart
 
 # Data Processing
-openpyxl>=3.1.0
-pandas>=2.2.0
+openpyxl
+pandas
 
 # Web Scraping
-beautifulsoup4>=4.12.0
-requests>=2.32.0
-httpx>=0.27.0
+beautifulsoup4
+requests
+httpx
+
+# CPU-only PyTorch (MUST be installed before sentence-transformers)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
 
 # Embeddings
-sentence-transformers>=3.3.0
+sentence-transformers
 
 # Environment & Config
-python-dotenv>=1.0.0
-pydantic>=2.9.0
-pydantic-settings>=2.6.0
+python-dotenv
+pydantic
+pydantic-settings
 
 # Utilities
-aiofiles>=24.1.0
-tenacity>=9.0.0
+aiofiles
+tenacity
 
 # Security
-cryptography>=43.0.0
+cryptography
